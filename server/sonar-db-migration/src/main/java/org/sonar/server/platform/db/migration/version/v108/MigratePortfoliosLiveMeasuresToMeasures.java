@@ -17,19 +17,14 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.db.measure;
+package org.sonar.server.platform.db.migration.version.v108;
 
-import java.util.Comparator;
+import org.sonar.api.utils.System2;
+import org.sonar.db.Database;
 
-public enum LiveMeasureComparator implements Comparator<LiveMeasureDto> {
-  INSTANCE;
+public class MigratePortfoliosLiveMeasuresToMeasures extends AbstractMigrateLiveMeasuresToMeasures {
 
-  @Override
-  public int compare(LiveMeasureDto o1, LiveMeasureDto o2) {
-    int componentUuidComp = o1.getComponentUuid().compareTo(o2.getComponentUuid());
-    if (componentUuidComp != 0) {
-      return componentUuidComp;
-    }
-    return o1.getMetricUuid().compareTo(o2.getMetricUuid());
+  protected MigratePortfoliosLiveMeasuresToMeasures(Database db, System2 system2) {
+    super(db, system2, "portfolios", "portfolio");
   }
 }

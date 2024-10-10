@@ -17,33 +17,7 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.db.measure;
+@ParametersAreNonnullByDefault
+package org.sonar.server.platform.db.migration.version.v108;
 
-import javax.annotation.Nullable;
-
-public class ProjectMainBranchLiveMeasureDto {
-  private String projectUuid;
-  private String metricUuid;
-  @Nullable
-  private Double value;
-  @Nullable
-  private String textValue;
-
-  public String getProjectUuid() {
-    return projectUuid;
-  }
-
-  @Nullable
-  public Double getValue() {
-    return value;
-  }
-
-  @Nullable
-  public String getTextValue() {
-    return textValue;
-  }
-
-  public String getMetricUuid() {
-    return metricUuid;
-  }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

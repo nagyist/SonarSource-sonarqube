@@ -29,12 +29,14 @@ interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, '
   as?: React.ElementType;
   className?: string;
   isInvalid?: boolean;
+  isValid?: boolean;
   size?: InputSizeKeys;
 }
 
 interface InputTextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   className?: string;
   isInvalid?: boolean;
+  isValid?: boolean;
   size?: InputSizeKeys;
 }
 
@@ -68,10 +70,18 @@ const dangerStyle = (props: ThemedProps) => css`
   --focusOutline: var(--echoes-focus-border-width-default) solid var(--echoes-color-focus-default);
 `;
 
+const successStyle = (props: ThemedProps) => css`
+  --border: ${themeBorder('default', 'inputSuccess')(props)};
+  --focusBorder: ${themeBorder('default', 'inputSuccessFocus')(props)};
+  --focusOutline: ${themeBorder('focus', 'inputSuccessFocus')(props)};
+`;
+
 const getInputVariant = (props: ThemedProps & { isInvalid?: boolean; isValid?: boolean }) => {
-  const { isInvalid } = props;
+  const { isValid, isInvalid } = props;
   if (isInvalid) {
     return dangerStyle;
+  } else if (isValid) {
+    return successStyle;
   }
   return defaultStyle;
 };
@@ -89,7 +99,7 @@ const baseStyle = (props: ThemedProps) => css`
   ${tw`sw-px-3 sw-py-2`}
 
   &::placeholder {
-    color: ${themeColor('inputPlaceholder')(props)};
+    color: var(--echoes-color-text-placeholder);
   }
 
   &:hover {
@@ -114,7 +124,7 @@ const baseStyle = (props: ThemedProps) => css`
 
     ${tw`sw-cursor-not-allowed`};
     &::placeholder {
-      color: ${themeContrast('inputDisabled')(props)};
+      color: var(--echoes-color-text-disabled);
     }
   }
 `;
