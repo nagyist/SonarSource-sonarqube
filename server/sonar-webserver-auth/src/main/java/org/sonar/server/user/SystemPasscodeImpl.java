@@ -19,16 +19,17 @@
  */
 package org.sonar.server.user;
 
-import java.util.Objects;
+import java.security.MessageDigest;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.Startable;
 import org.sonar.api.config.Configuration;
 import org.sonar.api.server.ServerSide;
 import org.sonar.api.server.ws.Request;
-import org.slf4j.LoggerFactory;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.sonar.process.ProcessProperties.Property.WEB_SYSTEM_PASS_CODE;
 
 @ServerSide
@@ -53,9 +54,11 @@ public class SystemPasscodeImpl implements SystemPasscode, Startable {
 
   @Override
   public boolean isValidPasscode(@Nullable String passcode) {
-    return Optional.ofNullable(passcode)
-      .map(s -> Objects.equals(configuredPasscode, s))
-      .orElse(false);
+    if (configuredPasscode == null || passcode == null) {
+      return false;
+    }
+    // Constant-time comparison to avoid leaking the passcode through response timing.
+    return MessageDigest.isEqual(configuredPasscode.getBytes(UTF_8), passcode.getBytes(UTF_8));
   }
 
   @Override

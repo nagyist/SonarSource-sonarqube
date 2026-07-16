@@ -80,6 +80,8 @@ public class SystemPasscodeImplTest {
       {null, null, false},
       {null, "toto", false},
       {"toto", null, false},
+      {"toto", "tot", false},
+      {"toto", "totox", false},
     };
   }
 
