@@ -25,6 +25,7 @@ import org.sonarsource.history.server.db.repository.IssueCountDimensionsReposito
 import org.sonarsource.history.server.db.repository.IssueCountHistoryRepository;
 import org.sonarsource.history.server.db.repository.MeasureHistoryRepository;
 import org.sonarsource.history.server.db.repository.MeasureKeyMappingRepository;
+import org.sonarsource.history.server.service.HistoryPurgeService;
 import org.sonarsource.history.server.service.IssueCountHistoryRecordingService;
 import org.sonarsource.history.server.service.MeasuresHistoryRecordingService;
 
@@ -43,6 +44,7 @@ class HistoryComponentProviderTest {
         MeasureHistoryRepository.class,
         MeasureKeyMappingRepository.class,
         IssueCountHistoryRecordingService.class,
-        MeasuresHistoryRecordingService.class);
+        MeasuresHistoryRecordingService.class,
+        HistoryPurgeService.class);
   }
 }

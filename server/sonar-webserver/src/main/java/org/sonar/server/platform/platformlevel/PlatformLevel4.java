@@ -53,6 +53,10 @@ import org.sonar.ce.task.projectanalysis.taskprocessor.AuditPurgeTaskProcessor;
 import org.sonar.ce.task.projectanalysis.taskprocessor.IssueSyncTaskProcessor;
 import org.sonar.ce.task.projectanalysis.taskprocessor.ReportTaskProcessor;
 import org.sonar.ce.task.projectexport.taskprocessor.ProjectExportTaskProcessor;
+import org.sonar.ce.task.purgehistory.HistoryPurgeExecutorServiceImpl;
+import org.sonar.ce.task.purgehistory.HistoryPurgeInitializer;
+import org.sonar.ce.task.purgehistory.HistoryPurgeSchedulerImpl;
+import org.sonar.ce.task.projectanalysis.taskprocessor.HistoryPurgeTaskProcessor;
 import org.sonar.core.extension.CoreExtensionsInstaller;
 import org.sonar.core.language.LanguagesProvider;
 import org.sonar.core.metric.SoftwareQualitiesMetrics;
@@ -719,6 +723,10 @@ public class PlatformLevel4 extends PlatformLevel {
       ReportTaskProcessor.class,
       IssueSyncTaskProcessor.class,
       AuditPurgeTaskProcessor.class,
+      HistoryPurgeTaskProcessor.class,
+      HistoryPurgeSchedulerImpl.class,
+      HistoryPurgeExecutorServiceImpl.class,
+      HistoryPurgeInitializer.class,
       ProjectExportTaskProcessor.class,
 
       // SonarSource editions

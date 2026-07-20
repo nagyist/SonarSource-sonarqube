@@ -30,6 +30,7 @@ import static org.sonar.core.config.Frequency.MONTHLY;
 
 public final class PurgeProperties {
   public static final String DEFAULT_FREQUENCY = MONTHLY.getDescription();
+  public static final int DEFAULT_HISTORY_MAX_AGE_IN_DAYS = 365;
 
   private PurgeProperties() {
   }
@@ -124,6 +125,16 @@ public final class PurgeProperties {
         .category(CoreProperties.CATEGORY_HOUSEKEEPING)
         .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
         .index(8)
+        .build(),
+
+      PropertyDefinition.builder(PurgeConstants.DAYS_BEFORE_DELETING_HISTORY)
+        .defaultValue(String.valueOf(DEFAULT_HISTORY_MAX_AGE_IN_DAYS))
+        .name("Delete history after")
+        .description("History for issue counts, issue resolution data, and measures older than this many days will be deleted.")
+        .type(PropertyType.INTEGER)
+        .category(CoreProperties.CATEGORY_HOUSEKEEPING)
+        .subCategory(CoreProperties.SUBCATEGORY_GENERAL)
+        .index(9)
         .build());
   }
 }

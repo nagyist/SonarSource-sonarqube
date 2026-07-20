@@ -57,6 +57,7 @@ import org.sonar.ce.task.projectanalysis.issue.AdHocRuleCreator;
 import org.sonar.ce.task.projectanalysis.notification.ReportAnalysisFailureNotificationModule;
 import org.sonar.ce.task.projectanalysis.taskprocessor.AuditPurgeTaskModule;
 import org.sonar.ce.task.projectanalysis.taskprocessor.IssueSyncTaskModule;
+import org.sonar.ce.task.projectanalysis.taskprocessor.HistoryPurgeTaskModule;
 import org.sonar.ce.taskprocessor.CeProcessingScheduler;
 import org.sonar.ce.taskprocessor.CeTaskProcessorModule;
 import org.sonar.core.config.CorePropertyDefinitions;
@@ -93,6 +94,7 @@ import org.sonar.server.config.ConfigurationProvider;
 import org.sonar.server.email.EmailSmtpConfiguration;
 import org.sonar.server.es.EsModule;
 import org.sonar.server.es.IndexersImpl;
+import org.sonar.server.events.EventsCeComponents;
 import org.sonar.server.extension.CoreExtensionBootstraper;
 import org.sonar.server.extension.CoreExtensionStopper;
 import org.sonar.server.favorite.FavoriteUpdater;
@@ -127,6 +129,7 @@ import org.sonar.server.notification.email.EmailNotificationChannel;
 import org.sonar.server.oauth.OAuthMicrosoftRestClient;
 import org.sonar.server.permission.index.PermissionIndexer;
 import org.sonar.server.platform.DefaultNodeInformation;
+import org.sonar.server.platform.InstallationDateProviderImpl;
 import org.sonar.server.platform.OfficialDistribution;
 import org.sonar.server.platform.ServerFileSystemImpl;
 import org.sonar.server.platform.ServerImpl;
@@ -165,14 +168,12 @@ import org.sonar.server.view.index.ViewIndexer;
 import org.sonar.server.webhook.WebhookModule;
 import org.sonarqube.ws.Rules;
 import org.sonarsource.compliancereports.ingestion.IssueIngestionService;
-import org.sonar.server.platform.InstallationDateProviderImpl;
 import org.sonarsource.gessie.server.GessieProperties;
 import org.sonarsource.gessie.server.telemetry.GessieTelemetryCeConfiguration;
+import org.sonarsource.history.server.bean.HistoryServerPlatformLevel1Module;
 import org.sonarsource.sonarqube.events.server.ServerEventAsyncClient;
 import org.sonarsource.sonarqube.events.server.ServerEventSourceBuilder;
-import org.sonarsource.history.server.bean.HistoryServerPlatformLevel1Module;
 import org.sonarsource.users.server.bean.UsersServerComponents;
-import org.sonar.server.events.EventsCeComponents;
 
 import static java.util.Objects.requireNonNull;
 import static org.sonar.core.extension.CoreExtensionsInstaller.noAdditionalSideFilter;
@@ -472,6 +473,7 @@ public class ComputeEngineContainerImpl implements ComputeEngineContainer {
       new ProjectAnalysisTaskModule(),
       new IssueSyncTaskModule(),
       new AuditPurgeTaskModule(),
+      new HistoryPurgeTaskModule(),
       new CeTaskProcessorModule(),
       OfficialDistribution.class,
 
