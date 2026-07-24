@@ -101,6 +101,7 @@ class ChangePasswordActionIT {
     db.users().insertDefaultGroup();
     responseOutputStream = new StringOutputStream();
     doReturn(responseOutputStream).when(response).getOutputStream();
+    when(request.getMethod()).thenReturn("POST");
   }
 
   @Test
@@ -136,6 +137,23 @@ class ChangePasswordActionIT {
     assertThat(findSessionTokenDto(db.getSession(), admin.getSessionTokenUuid())).isPresent();
     verifyNoInteractions(jwtHttpHandler);
     verify(response).setStatus(HTTP_NO_CONTENT);
+  }
+
+  @Test
+  void fail_and_do_not_change_password_when_request_method_is_not_post() {
+    UserTestData admin = createLocalUser();
+    userSessionRule.logIn(admin.userDto()).setSystemAdministrator();
+    UserTestData user = createLocalUser(OLD_PASSWORD);
+    String originalPassword = findEncryptedPassword(user.getLogin());
+    when(request.getMethod()).thenReturn("GET");
+    when(request.getParameter(PARAM_LOGIN)).thenReturn(user.getLogin());
+    when(request.getParameter(PARAM_PASSWORD)).thenReturn(NEW_PASSWORD);
+
+    underTest.doFilter(request, response, chain);
+
+    verify(response).setStatus(HTTP_BAD_REQUEST);
+    assertThat(findEncryptedPassword(user.getLogin())).isEqualTo(originalPassword);
+    verifyNoInteractions(jwtHttpHandler);
   }
 
   private String findEncryptedPassword(String login) {

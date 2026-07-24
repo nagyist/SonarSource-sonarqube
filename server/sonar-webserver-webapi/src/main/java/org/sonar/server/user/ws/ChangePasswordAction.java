@@ -58,6 +58,7 @@ import static org.sonar.server.user.ws.ChangePasswordAction.PasswordMessage.NEW_
 import static org.sonar.server.user.ws.ChangePasswordAction.PasswordMessage.OLD_PASSWORD_INCORRECT;
 import static org.sonarqube.ws.MediaTypes.JSON;
 import static org.sonarqube.ws.WsUtils.isNullOrEmpty;
+import static org.sonarqube.ws.client.WsRequest.Method.POST;
 import static org.sonarqube.ws.client.user.UsersWsParameters.PARAM_LOGIN;
 import static org.sonarqube.ws.client.user.UsersWsParameters.PARAM_PASSWORD;
 import static org.sonarqube.ws.client.user.UsersWsParameters.PARAM_PREVIOUS_PASSWORD;
@@ -129,6 +130,10 @@ public class ChangePasswordAction extends HttpFilter implements BaseUsersWsActio
 
   @Override
   public void doFilter(HttpRequest request, HttpResponse response, FilterChain chain) {
+    if (!request.getMethod().equals(POST.name())) {
+      setResponseStatus(response, HTTP_BAD_REQUEST);
+      return;
+    }
     userSession.checkLoggedIn();
     try (DbSession dbSession = dbClient.openSession(false)) {
       String login = getParamOrThrow(request, PARAM_LOGIN);
