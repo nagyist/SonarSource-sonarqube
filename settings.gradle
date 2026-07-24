@@ -104,6 +104,8 @@ def useLocalUnificationModule = { String propName, String subPath, List<String> 
 }
 
 useLocalUnificationModule('useLocalOrg', 'organizations', ['organizations-api', 'organizations-server-app'])
+useLocalUnificationModule('useLocalEntitlements', 'billing/entitlements', ['entitlements-api'])
+useLocalUnificationModule('useLocalConsumption', 'billing/consumption', ['consumption-api'])
 useLocalUnificationModule('useLocalMetrics', 'analysis-processing/metrics', ['metrics-api', 'metrics-server-app'])
 useLocalUnificationModule('useLocalArchitecture', 'architecture',
   ['architecture-server-app', 'architecture-api', 'architecture-unified-app', 'architecture-datastructure'],
