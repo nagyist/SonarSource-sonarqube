@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import jakarta.annotation.Priority;
+import javax.annotation.Nullable;
 import org.sonar.api.server.ServerSide;
 import org.sonar.db.DbSession;
 
@@ -97,9 +98,9 @@ public class DelegatingManagedServices implements ManagedInstanceService, Manage
   }
 
   @Override
-  public void queueSynchronisationTask() {
+  public void queueSynchronisationTask(@Nullable String submitterUuid) {
     findManagedInstanceService()
-      .ifPresent(ManagedInstanceService::queueSynchronisationTask);
+      .ifPresent(managedInstanceService -> managedInstanceService.queueSynchronisationTask(submitterUuid));
   }
 
   private Optional<ManagedInstanceService> findManagedInstanceService() {

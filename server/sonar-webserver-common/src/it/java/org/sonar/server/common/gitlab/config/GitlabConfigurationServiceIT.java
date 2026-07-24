@@ -40,11 +40,13 @@ import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.management.ManagedInstanceService;
 import org.sonar.server.setting.ThreadLocalSettings;
+import org.sonar.server.user.UserSession;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -87,16 +89,21 @@ public class GitlabConfigurationServiceIT {
   @Mock
   private ThreadLocalSettings threadLocalSettings;
 
+  @Mock
+  private UserSession userSession;
+
   private GitlabConfigurationService gitlabConfigurationService;
 
   @Before
   public void setUp() {
     when(managedInstanceService.getProviderName()).thenReturn("gitlab");
+    when(userSession.getUuid()).thenReturn("user-uuid");
     gitlabConfigurationService = new GitlabConfigurationService(
       dbTester.getDbClient(),
       managedInstanceService,
       gitlabGlobalSettingsValidator,
-      threadLocalSettings);
+      threadLocalSettings,
+      userSession);
   }
 
   @Test
@@ -314,7 +321,7 @@ public class GitlabConfigurationServiceIT {
     verifySettingWasSet(GITLAB_AUTH_PROVISIONING_ENABLED, "true");
     verifySettingWasSet(GITLAB_AUTH_ALLOW_USERS_TO_SIGNUP, "true");
     verifySettingWasSet(GITLAB_AUTH_PROVISIONING_TOKEN, "provisioningToken");
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
 
     assertConfigurationFields(gitlabConfiguration);
   }
@@ -322,7 +329,7 @@ public class GitlabConfigurationServiceIT {
   @Test
   public void updateConfiguration_whenAllUpdateFieldDefinedAndSetToFalse_updatesEverything() {
     gitlabConfigurationService.createConfiguration(buildGitlabConfiguration(AUTO_PROVISIONING));
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
     clearInvocations(managedInstanceService);
 
     UpdateGitlabConfigurationRequest updateRequest = builder()
@@ -351,7 +358,7 @@ public class GitlabConfigurationServiceIT {
     dbSession.commit();
 
     gitlabConfigurationService.createConfiguration(buildGitlabConfiguration(AUTO_PROVISIONING));
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
     reset(managedInstanceService);
 
     UpdateGitlabConfigurationRequest updateRequest = builder()
@@ -369,7 +376,7 @@ public class GitlabConfigurationServiceIT {
   @Test
   public void updateConfiguration_whenResettingAutoFromAuto_shouldTriggerSync() {
     gitlabConfigurationService.createConfiguration(buildGitlabConfiguration(AUTO_PROVISIONING));
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
     reset(managedInstanceService);
 
     UpdateGitlabConfigurationRequest updateRequest = builder()
@@ -379,7 +386,7 @@ public class GitlabConfigurationServiceIT {
 
     gitlabConfigurationService.updateConfiguration(updateRequest);
 
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
   }
 
   @Test
@@ -401,7 +408,7 @@ public class GitlabConfigurationServiceIT {
     assertThatThrownBy(() -> gitlabConfigurationService.updateConfiguration(updateRequest))
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("GitLab authentication must be turned on to enable GitLab provisioning.");
-    verify(managedInstanceService, times(0)).queueSynchronisationTask();
+    verify(managedInstanceService, times(0)).queueSynchronisationTask(anyString());
   }
 
   @Test
@@ -423,7 +430,7 @@ public class GitlabConfigurationServiceIT {
     assertThatThrownBy(() -> gitlabConfigurationService.updateConfiguration(updateRequest))
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("Provisioning token must be set to enable GitLab provisioning.");
-    verify(managedInstanceService, times(0)).queueSynchronisationTask();
+    verify(managedInstanceService, times(0)).queueSynchronisationTask(anyString());
   }
 
   @Test
@@ -510,7 +517,7 @@ public class GitlabConfigurationServiceIT {
 
     verifyCommonSettings(configuration);
 
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
 
   }
 
@@ -572,7 +579,7 @@ public class GitlabConfigurationServiceIT {
     verifySettingWasSet(GITLAB_AUTH_ALLOW_ALL_GROUPS, "true");
     assertThat(created.allowAllGroups()).isTrue();
     assertThat(created.allowedGroups()).isEmpty();
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
   }
 
   @Test
@@ -686,7 +693,7 @@ public class GitlabConfigurationServiceIT {
 
     gitlabConfigurationService.triggerRun();
 
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
   }
 
   @Test

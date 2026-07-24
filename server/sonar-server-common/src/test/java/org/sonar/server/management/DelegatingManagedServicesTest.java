@@ -21,6 +21,7 @@ package org.sonar.server.management;
 
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -213,7 +214,7 @@ public class DelegatingManagedServicesTest {
 
   @Test
   public void queueSynchronisationTask_whenManagedNoInstanceServices_doesNotFail() {
-    assertThatNoException().isThrownBy(NO_MANAGED_SERVICES::queueSynchronisationTask);
+    assertThatNoException().isThrownBy(() -> NO_MANAGED_SERVICES.queueSynchronisationTask("submitter-uuid"));
   }
 
   @Test
@@ -223,9 +224,9 @@ public class DelegatingManagedServicesTest {
     Set<ManagedInstanceService> delegates = Set.of(neverManagedInstanceService, alwaysManagedInstanceService);
     DelegatingManagedServices managedInstanceService = new DelegatingManagedServices(delegates);
 
-    managedInstanceService.queueSynchronisationTask();
-    verify(neverManagedInstanceService, never()).queueSynchronisationTask();
-    verify(alwaysManagedInstanceService).queueSynchronisationTask();
+    managedInstanceService.queueSynchronisationTask("submitter-uuid");
+    verify(neverManagedInstanceService, never()).queueSynchronisationTask(anyString());
+    verify(alwaysManagedInstanceService).queueSynchronisationTask("submitter-uuid");
   }
 
   private ManagedInstanceService getManagedInstanceService(Set<String> userUuids, Map<String, Boolean> uuidToManaged) {
@@ -350,8 +351,8 @@ public class DelegatingManagedServicesTest {
     }
 
     @Override
-    public void queueSynchronisationTask() {
-
+    public void queueSynchronisationTask(@Nullable String submitterUuid) {
+      // no-op: only interactions are verified in tests
     }
 
     @Override
@@ -418,8 +419,8 @@ public class DelegatingManagedServicesTest {
     }
 
     @Override
-    public void queueSynchronisationTask() {
-
+    public void queueSynchronisationTask(@Nullable String submitterUuid) {
+      // no-op: only interactions are verified in tests
     }
 
     @Override

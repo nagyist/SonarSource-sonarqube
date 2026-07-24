@@ -21,6 +21,7 @@ package org.sonar.server.management;
 
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.sonar.db.DbSession;
 
 public interface ManagedInstanceService {
@@ -43,6 +44,6 @@ public interface ManagedInstanceService {
 
   boolean isGroupManaged(DbSession dbSession, String groupUuid);
 
-  void queueSynchronisationTask();
+  void queueSynchronisationTask(@Nullable String submitterUuid);
 
 }

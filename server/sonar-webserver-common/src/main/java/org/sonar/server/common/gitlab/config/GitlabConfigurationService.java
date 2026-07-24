@@ -37,6 +37,7 @@ import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.management.ManagedInstanceService;
 import org.sonar.server.setting.ThreadLocalSettings;
+import org.sonar.server.user.UserSession;
 
 import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -79,13 +80,16 @@ public class GitlabConfigurationService {
   private final ManagedInstanceService managedInstanceService;
   private final GitlabGlobalSettingsValidator gitlabGlobalSettingsValidator;
   private final ThreadLocalSettings threadLocalSettings;
+  private final UserSession userSession;
 
   public GitlabConfigurationService(DbClient dbClient,
-    ManagedInstanceService managedInstanceService, GitlabGlobalSettingsValidator gitlabGlobalSettingsValidator, ThreadLocalSettings threadLocalSettings) {
+    ManagedInstanceService managedInstanceService, GitlabGlobalSettingsValidator gitlabGlobalSettingsValidator, ThreadLocalSettings threadLocalSettings,
+    UserSession userSession) {
     this.dbClient = dbClient;
     this.managedInstanceService = managedInstanceService;
     this.gitlabGlobalSettingsValidator = gitlabGlobalSettingsValidator;
     this.threadLocalSettings = threadLocalSettings;
+    this.userSession = userSession;
   }
 
   public GitlabConfiguration updateConfiguration(UpdateGitlabConfigurationRequest updateRequest) {
@@ -299,7 +303,7 @@ public class GitlabConfigurationService {
 
   private void triggerRun(GitlabConfiguration gitlabConfiguration) {
     throwIfConfigIncompleteOrInstanceAlreadyManaged(gitlabConfiguration);
-    managedInstanceService.queueSynchronisationTask();
+    managedInstanceService.queueSynchronisationTask(userSession.getUuid());
   }
 
   private void throwIfConfigIncompleteOrInstanceAlreadyManaged(GitlabConfiguration configuration) {

@@ -39,6 +39,7 @@ import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.management.ManagedInstanceService;
 import org.sonar.server.setting.ThreadLocalSettings;
+import org.sonar.server.user.UserSession;
 
 import static java.lang.String.format;
 import static org.sonar.api.utils.Preconditions.checkState;
@@ -83,15 +84,17 @@ public class GithubConfigurationService {
   private final GithubGlobalSettingsValidator githubGlobalSettingsValidator;
   private final ThreadLocalSettings threadLocalSettings;
   private final DevOpsConfigurationTelemetry devOpsConfigurationTelemetry;
+  private final UserSession userSession;
 
   public GithubConfigurationService(DbClient dbClient,
     ManagedInstanceService managedInstanceService, GithubGlobalSettingsValidator githubGlobalSettingsValidator, ThreadLocalSettings threadLocalSettings,
-    DevOpsConfigurationTelemetry devOpsConfigurationTelemetry) {
+    DevOpsConfigurationTelemetry devOpsConfigurationTelemetry, UserSession userSession) {
     this.dbClient = dbClient;
     this.managedInstanceService = managedInstanceService;
     this.githubGlobalSettingsValidator = githubGlobalSettingsValidator;
     this.threadLocalSettings = threadLocalSettings;
     this.devOpsConfigurationTelemetry = devOpsConfigurationTelemetry;
+    this.userSession = userSession;
   }
 
   public GithubConfiguration updateConfiguration(UpdateGithubConfigurationRequest updateRequest) {
@@ -341,7 +344,7 @@ public class GithubConfigurationService {
 
   private void triggerRun(GithubConfiguration githubConfiguration) {
     throwIfConfigIncompleteOrInstanceAlreadyManaged(githubConfiguration);
-    managedInstanceService.queueSynchronisationTask();
+    managedInstanceService.queueSynchronisationTask(userSession.getUuid());
   }
 
   private void throwIfConfigIncompleteOrInstanceAlreadyManaged(GithubConfiguration configuration) {

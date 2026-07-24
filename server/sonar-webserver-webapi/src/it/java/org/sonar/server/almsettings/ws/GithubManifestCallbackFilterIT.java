@@ -68,7 +68,7 @@ public class GithubManifestCallbackFilterIT {
   // transactional rollback be observed when the DevOps binding fails.
   private final DevOpsConfigurationTelemetry devOpsConfigurationTelemetry = mock(DevOpsConfigurationTelemetry.class);
   private final GithubConfigurationService githubConfigurationService = new GithubConfigurationService(db.getDbClient(),
-    mock(ManagedInstanceService.class), mock(GithubGlobalSettingsValidator.class), mock(ThreadLocalSettings.class), devOpsConfigurationTelemetry);
+    mock(ManagedInstanceService.class), mock(GithubGlobalSettingsValidator.class), mock(ThreadLocalSettings.class), devOpsConfigurationTelemetry, userSession);
   private final GithubManifestStateStore stateStore = new GithubManifestStateStore(System2.INSTANCE);
   private final AlmSettingsSupport almSettingsSupport = new AlmSettingsSupport(db.getDbClient(), userSession,
     new ComponentFinder(db.getDbClient(), mock(ComponentTypes.class)), multipleAlmFeature);

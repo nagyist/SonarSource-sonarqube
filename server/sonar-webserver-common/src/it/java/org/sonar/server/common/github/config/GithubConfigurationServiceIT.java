@@ -42,6 +42,7 @@ import org.sonar.server.exceptions.BadRequestException;
 import org.sonar.server.exceptions.NotFoundException;
 import org.sonar.server.management.ManagedInstanceService;
 import org.sonar.server.setting.ThreadLocalSettings;
+import org.sonar.server.user.UserSession;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -95,17 +96,22 @@ public class GithubConfigurationServiceIT {
   @Mock
   private DevOpsConfigurationTelemetry devOpsConfigurationTelemetry;
 
+  @Mock
+  private UserSession userSession;
+
   private GithubConfigurationService githubConfigurationService;
 
   @Before
   public void setUp() {
     when(managedInstanceService.getProviderName()).thenReturn("github");
+    when(userSession.getUuid()).thenReturn("user-uuid");
     githubConfigurationService = new GithubConfigurationService(
       dbTester.getDbClient(),
       managedInstanceService,
       githubGlobalSettingsValidator,
       threadLocalSettings,
-      devOpsConfigurationTelemetry);
+      devOpsConfigurationTelemetry,
+      userSession);
   }
 
   @Test
@@ -213,7 +219,7 @@ public class GithubConfigurationServiceIT {
     verifySettingWasSet(GITHUB_ALLOW_USERS_TO_SIGN_UP, "true");
     verifySettingWasSet(GITHUB_PROVISION_PROJECT_VISIBILITY, "true");
     verifySettingExistsButEmpty(GITHUB_USER_CONSENT_FOR_PERMISSIONS_REQUIRED_AFTER_UPGRADE);
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
 
     assertConfigurationFields(githubConfiguration);
   }
@@ -221,7 +227,7 @@ public class GithubConfigurationServiceIT {
   @Test
   public void updateConfiguration_whenAllUpdateFieldDefinedAndSetToFalse_updatesEverything() {
     githubConfigurationService.createConfiguration(buildGithubConfigurationWithUserConsentTrue(AUTO_PROVISIONING));
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
     clearInvocations(managedInstanceService);
 
     UpdateGithubConfigurationRequest updateRequest = builder()
@@ -251,7 +257,7 @@ public class GithubConfigurationServiceIT {
     dbSession.commit();
 
     githubConfigurationService.createConfiguration(buildGithubConfigurationWithUserConsentTrue(AUTO_PROVISIONING));
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
     reset(managedInstanceService);
 
     UpdateGithubConfigurationRequest updateRequest = builder()
@@ -285,7 +291,7 @@ public class GithubConfigurationServiceIT {
     assertThatThrownBy(() -> githubConfigurationService.updateConfiguration(updateRequest))
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("GitHub authentication must be turned on to enable GitHub provisioning.");
-    verify(managedInstanceService, times(0)).queueSynchronisationTask();
+    verify(managedInstanceService, times(0)).queueSynchronisationTask(anyString());
   }
 
   @Test
@@ -388,7 +394,7 @@ public class GithubConfigurationServiceIT {
     githubConfigurationService.updateConfiguration(updateRequest);
 
     verifySettingWasDeleted(GITHUB_USER_CONSENT_FOR_PERMISSIONS_REQUIRED_AFTER_UPGRADE);
-    verify(managedInstanceService, never()).queueSynchronisationTask();
+    verify(managedInstanceService, never()).queueSynchronisationTask(anyString());
   }
 
   @Test
@@ -406,7 +412,7 @@ public class GithubConfigurationServiceIT {
     githubConfigurationService.updateConfiguration(updateRequest);
 
     verifySettingWasDeleted(GITHUB_USER_CONSENT_FOR_PERMISSIONS_REQUIRED_AFTER_UPGRADE);
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
   }
 
   @Test
@@ -422,7 +428,7 @@ public class GithubConfigurationServiceIT {
 
     githubConfigurationService.updateConfiguration(updateRequest);
 
-    verify(managedInstanceService, never()).queueSynchronisationTask();
+    verify(managedInstanceService, never()).queueSynchronisationTask(anyString());
   }
 
   private static void assertConfigurationFields(GithubConfiguration configuration) {
@@ -463,7 +469,7 @@ public class GithubConfigurationServiceIT {
 
     verifyCommonSettings(configuration);
 
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
 
   }
 
@@ -489,7 +495,7 @@ public class GithubConfigurationServiceIT {
     GithubConfiguration created = githubConfigurationService.createConfiguration(configuration);
 
     assertConfigurationIsCorrect(configuration, created);
-    verify(managedInstanceService).queueSynchronisationTask();
+    verify(managedInstanceService).queueSynchronisationTask("user-uuid");
   }
 
   @Test
