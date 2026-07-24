@@ -114,6 +114,20 @@ public class CreateIndexBuilderTest {
       "CREATE UNIQUE INDEX rules_key ON rules (COALESCE(repository, ''), rule_key)");
   }
 
+  @Test
+  public void build_whenDialectPostgres14OrLower_shouldHaveCoalesceConditionsOnNullableDescendingColumns() throws SQLException {
+    PostgreSql postgreSql = new PostgreSql();
+    postgreSql.init(getMetadataForDbVersion(14, 0));
+
+    verifySql(new CreateIndexBuilder(postgreSql)
+        .setTable("rules")
+        .setName("rules_key")
+        .addColumn("repository", true, true)
+        .addColumn("rule_key", false)
+        .setUnique(true),
+      "CREATE UNIQUE INDEX rules_key ON rules (COALESCE(repository, '') DESC, rule_key)");
+  }
+
   private static DatabaseMetaData getMetadataForDbVersion(int major, int minor) throws SQLException {
     DatabaseMetaData databaseMetaData = Mockito.mock(DatabaseMetaData.class);
     Mockito.when(databaseMetaData.getDatabaseMajorVersion()).thenReturn(major);

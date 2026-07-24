@@ -60,10 +60,10 @@ Important read: [Data Ownership Principles](https://xtranet-sonarsource.atlassia
 | perm_tpl_characteristics |  |
 | permission_templates |  |
 | plugins |  |
-| portfolio_proj_branches | Enterprise Reporting and Hierarchy Squad |
-| portfolio_projects | Enterprise Reporting and Hierarchy Squad |
-| portfolio_references | Enterprise Reporting and Hierarchy Squad |
-| portfolios | Enterprise Reporting and Hierarchy Squad |
+| portfolio_proj_branches | Organization & Reporting Squad |
+| portfolio_projects | Organization & Reporting Squad |
+| portfolio_references | Organization & Reporting Squad |
+| portfolios | Organization & Reporting Squad |
 | project_alm_settings | Integration Squad |
 | project_badge_token | Dev and Team Workflow Squad |
 | project_branches |  |
@@ -95,9 +95,11 @@ Important read: [Data Ownership Principles](https://xtranet-sonarsource.atlassia
 | rules_profiles | Dev and Team Workflow Squad |
 | saml_message_ids |  |
 | sca_dependencies | SCA Squad |
+| sca_issue_dimensions | Organization & Reporting Squad |
 | sca_issues | SCA Squad |
 | sca_issues_releases | SCA Squad |
 | sca_releases | SCA Squad |
+| sca_ttr_history | Organization & Reporting Squad |
 | sca_vulnerability_issues | SCA Squad |
 | scanner_analysis_cache |  |
 | schema_migrations |  |
